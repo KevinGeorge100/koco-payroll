@@ -14,7 +14,6 @@ const UserManagement = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterRole, setFilterRole] = useState('all');
 
   useEffect(() => {
     fetchUsers();
@@ -47,27 +46,6 @@ const UserManagement = () => {
     }
   };
 
-  const updateUserRole = async (userId, newRole) => {
-    try {
-      const { error } = await supabase
-        .from('user_profiles')
-        .update({ role: newRole, updated_at: new Date().toISOString() })
-        .eq('user_id', userId);
-
-      if (error) throw error;
-      
-      // Update local state
-      setUsers(users.map(user => 
-        user.user_id === userId 
-          ? { ...user, role: newRole }
-          : user
-      ));
-    } catch (error) {
-      console.error('Error updating user role:', error);
-      alert('Failed to update user role');
-    }
-  };
-
   const toggleUserStatus = async (userId, currentStatus) => {
     try {
       const { error } = await supabase
@@ -93,28 +71,13 @@ const UserManagement = () => {
   };
 
   const filteredUsers = users.filter(user => {
-    const matchesSearch = 
+    const matchesSearch = searchTerm === '' || 
       user.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.last_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email?.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesRole = filterRole === 'all' || user.role === filterRole;
-    
-    return matchesSearch && matchesRole;
+    return matchesSearch;
   });
-
-  const getRoleBadgeColor = (role) => {
-    switch (role) {
-      case 'admin':
-        return 'bg-red-100 text-red-800';
-      case 'hr':
-        return 'bg-blue-100 text-blue-800';
-      case 'employee':
-        return 'bg-green-100 text-green-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
 
   if (loading) {
     return (
@@ -155,18 +118,6 @@ const UserManagement = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           />
-        </div>
-        <div>
-          <select
-            value={filterRole}
-            onChange={(e) => setFilterRole(e.target.value)}
-            className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="all">All Roles</option>
-            <option value="admin">Admin</option>
-            <option value="hr">HR</option>
-            <option value="employee">Employee</option>
-          </select>
         </div>
       </div>
 
@@ -211,15 +162,9 @@ const UserManagement = () => {
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <select
-                    value={user.role}
-                    onChange={(e) => updateUserRole(user.user_id, e.target.value)}
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border-0 bg-transparent ${getRoleBadgeColor(user.role)}`}
-                  >
-                    <option value="employee">Employee</option>
-                    <option value="hr">HR</option>
-                    <option value="admin">Admin</option>
-                  </select>
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                    User
+                  </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <button
@@ -266,8 +211,8 @@ const UserManagement = () => {
             <Users className="mx-auto h-12 w-12 text-gray-400" />
             <h3 className="mt-2 text-sm font-medium text-gray-900">No users found</h3>
             <p className="mt-1 text-sm text-gray-500">
-              {searchTerm || filterRole !== 'all'
-                ? 'Try adjusting your search or filter criteria.'
+              {searchTerm
+                ? 'Try adjusting your search criteria.'
                 : 'Get started by adding a new user.'}
             </p>
           </div>

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useRole } from '../context/RoleContext';
 import {
   LayoutDashboard,
   Users,
@@ -63,7 +62,6 @@ const Layout = ({ children }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
-  const { userRole } = useRole();
   const location = useLocation();
 
   // Use all navigation sections without role filtering (rollback)
@@ -96,19 +94,6 @@ const Layout = ({ children }) => {
     const first = user.user_metadata.first_name?.[0] || '';
     const last = user.user_metadata.last_name?.[0] || '';
     return (first + last).toUpperCase() || 'U';
-  };
-
-  const getUserRole = (user) => {
-    return user?.user_metadata?.role || 'employee';
-  };
-
-  const getRoleBadgeColor = (role) => {
-    switch (role) {
-      case 'admin': return 'bg-purple-100 text-purple-800';
-      case 'hr': return 'bg-blue-100 text-blue-800';
-      case 'manager': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
   };
 
   return (
@@ -240,7 +225,7 @@ const Layout = ({ children }) => {
           <div className="border-t border-gray-200 p-4">
             <div className="flex items-center space-x-3 mb-4">
               <div className="flex-shrink-0">
-                <div className={`h-10 w-10 rounded-full ${getRoleBadgeColor(userRole || 'employee')} flex items-center justify-center font-medium text-sm`}>
+                <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center font-medium text-sm text-white">
                   {getUserInitials(user)}
                 </div>
               </div>
@@ -249,8 +234,8 @@ const Layout = ({ children }) => {
                   {user?.user_metadata?.first_name} {user?.user_metadata?.last_name}
                 </p>
                 <p className="text-xs text-gray-500 truncate">{user?.email}</p>
-                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium mt-1 ${getRoleBadgeColor(userRole || 'employee')}`}>
-                  {(userRole || 'employee').charAt(0).toUpperCase() + (userRole || 'employee').slice(1)}
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium mt-1 bg-blue-100 text-blue-800">
+                  Owner
                 </span>
               </div>
             </div>
@@ -340,14 +325,14 @@ const Layout = ({ children }) => {
                   className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                   aria-expanded={userMenuOpen}
                 >
-                  <div className={`h-8 w-8 rounded-full ${getRoleBadgeColor(getUserRole(user))} flex items-center justify-center font-medium text-xs`}>
+                  <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center font-medium text-xs text-white">
                     {getUserInitials(user)}
                   </div>
                   <div className="hidden md:block text-left">
                     <p className="text-sm font-medium text-gray-900">
                       {user?.user_metadata?.first_name}
                     </p>
-                    <p className="text-xs text-gray-500">{getUserRole(user)}</p>
+                    <p className="text-xs text-gray-500">Owner</p>
                   </div>
                   <ChevronDown className="h-4 w-4 text-gray-400" />
                 </button>
