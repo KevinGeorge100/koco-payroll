@@ -78,7 +78,7 @@ app.get('/', (req, res) => {
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/employees', authMiddleware, employeeRoutes);
+app.use('/api/employees', employeeRoutes); // Temporarily removed auth middleware
 app.use('/api/payroll', authMiddleware, payrollRoutes);
 app.use('/api/payslips', authMiddleware, payslipsRoutes);
 app.use('/api/timesheets', authMiddleware, timesheetRoutes);

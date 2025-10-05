@@ -14,15 +14,68 @@ DROP TABLE IF EXISTS attendance CASCADE;
 DROP TABLE IF EXISTS user_profiles CASCADE;
 DROP TABLE IF EXISTS employees CASCADE;
 DROP TABLE IF EXISTS departments CASCADE;
+DROP TABLE IF EXISTS benefits CASCADE;
+DROP TABLE IF EXISTS leave_requests CASCADE;
+DROP TABLE IF EXISTS leave_types CASCADE;
+DROP TABLE IF EXISTS positions CASCADE;
 
--- Drop any existing policies
-DROP POLICY IF EXISTS "Authenticated users can access" ON user_profiles;
-DROP POLICY IF EXISTS "Authenticated users can access" ON employees;
-DROP POLICY IF EXISTS "Authenticated users can access" ON attendance;
-DROP POLICY IF EXISTS "Authenticated users can access" ON leaves;
-DROP POLICY IF EXISTS "Authenticated users can access" ON payroll;
-DROP POLICY IF EXISTS "Authenticated users can access" ON timesheets;
-DROP POLICY IF EXISTS "Authenticated users can access" ON departments;
+-- Drop any existing policies (ignore errors if tables don't exist)
+DO $$ 
+BEGIN
+    -- Drop policies safely
+    DROP POLICY IF EXISTS "Authenticated users can access" ON user_profiles;
+    DROP POLICY IF EXISTS "Allow all for authenticated users" ON user_profiles;
+EXCEPTION 
+    WHEN undefined_table THEN NULL;
+END $$;
+
+DO $$ 
+BEGIN
+    DROP POLICY IF EXISTS "Authenticated users can access" ON employees;
+    DROP POLICY IF EXISTS "Allow all for authenticated users" ON employees;
+EXCEPTION 
+    WHEN undefined_table THEN NULL;
+END $$;
+
+DO $$ 
+BEGIN
+    DROP POLICY IF EXISTS "Authenticated users can access" ON attendance;
+    DROP POLICY IF EXISTS "Allow all for authenticated users" ON attendance;
+EXCEPTION 
+    WHEN undefined_table THEN NULL;
+END $$;
+
+DO $$ 
+BEGIN
+    DROP POLICY IF EXISTS "Authenticated users can access" ON leaves;
+    DROP POLICY IF EXISTS "Allow all for authenticated users" ON leaves;
+EXCEPTION 
+    WHEN undefined_table THEN NULL;
+END $$;
+
+DO $$ 
+BEGIN
+    DROP POLICY IF EXISTS "Authenticated users can access" ON payroll;
+    DROP POLICY IF EXISTS "Allow all for authenticated users" ON payroll;
+EXCEPTION 
+    WHEN undefined_table THEN NULL;
+END $$;
+
+DO $$ 
+BEGIN
+    DROP POLICY IF EXISTS "Authenticated users can access" ON timesheets;
+    DROP POLICY IF EXISTS "Allow all for authenticated users" ON timesheets;
+EXCEPTION 
+    WHEN undefined_table THEN NULL;
+END $$;
+
+DO $$ 
+BEGIN
+    DROP POLICY IF EXISTS "Authenticated users can access" ON departments;
+    DROP POLICY IF EXISTS "Allow all for authenticated users" ON departments;
+EXCEPTION 
+    WHEN undefined_table THEN NULL;
+END $$;
 
 -- Drop functions
 DROP FUNCTION IF EXISTS update_updated_at_column() CASCADE;

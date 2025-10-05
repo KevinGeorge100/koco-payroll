@@ -114,29 +114,35 @@ router.post('/', [
   body('phone').optional().trim(),
   body('dateOfBirth').optional().isISO8601(),
   body('hireDate').optional().isISO8601(),
-  body('departmentId').optional().trim(),
-  body('positionId').optional().trim(),
+  body('departmentId').optional().isUUID(),
+  body('position').optional().trim(),
+  body('positionId').optional().trim(), // Support both position and positionId
   body('salary').optional().isFloat({ min: 0 }),
   body('employeeNumber').optional().trim(),
   body('address').optional().trim(),
   body('emergencyContact').optional().isObject()
 ], validateRequest, async (req, res, next) => {
   try {
+    // Generate employee number if not provided
+    const employeeNumber = req.body.employeeNumber || `EMP${Date.now()}`;
+    
     const employeeData = {
+      employee_number: employeeNumber,
       first_name: req.body.firstName,
       last_name: req.body.lastName,
       email: req.body.email,
-      phone: req.body.phone,
-      date_of_birth: req.body.dateOfBirth,
-      hire_date: req.body.hireDate,
-      department_id: req.body.departmentId,
-      position_id: req.body.positionId,
-      salary: req.body.salary,
-      employee_number: req.body.employeeNumber,
-      address: req.body.address,
-      emergency_contact: req.body.emergencyContact,
+      phone: req.body.phone || null,
+      date_of_birth: req.body.dateOfBirth || null,
+      hire_date: req.body.hireDate || new Date().toISOString().split('T')[0],
+      department_id: req.body.departmentId || null,
+      position: req.body.position || req.body.positionId || null, // Handle both position and positionId
+      salary: req.body.salary || null,
+      address: req.body.address || null,
+      emergency_contact: req.body.emergencyContact || null,
       status: 'active'
     };
+
+    console.log('Creating employee with data:', employeeData);
 
     const { data: employee, error } = await supabase
       .from('employees')
